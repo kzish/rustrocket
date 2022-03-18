@@ -9,5 +9,5 @@ edition = "2021"
 rocket = "0.4.10"
 serde = {version = "1.0.136", features = ["derive"] }
 rocket_contrib = {version = "0.4.10", features = ["json"]}
-diesel = { version = "1.4.4", features = ["mysql"] }
+diesel = { version = "1.4.4", features = ["extras", "mysql", "default"] }
 dotenv = "0.15.0"

@@ -1,0 +1,13 @@
+[package]
+name = "rustrocket"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+rocket = "0.4.10"
+serde = {version = "1.0.136", features = ["derive"] }
+rocket_contrib = {version = "0.4.10", features = ["json"]}
+diesel = { version = "1.4.4", features = ["mysql"] }
+dotenv = "0.15.0"

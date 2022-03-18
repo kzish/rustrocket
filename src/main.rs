@@ -1,6 +1,7 @@
 #![feature(proc_macro_hygiene, decl_macro)]
 
 use rocket::request::FromForm;
+use rocket::request::Form;
 use serde::{Serialize, Deserialize};
 use rocket_contrib::json::Json;
 
@@ -13,20 +14,31 @@ extern crate dotenv;
 use diesel::{prelude::*, Queryable};
 use diesel::mysql::MysqlConnection;
 
-
 use dotenv::dotenv;
 use std::env;
 
-
-
 mod schema;
 
-#[derive(FromForm, Serialize, Deserialize
-,Queryable 
-, Clone, Default, QueryId, SqlType
+#[derive(FromForm, 
+    Serialize, 
+    Deserialize,
+    Queryable,
+    Clone, 
+    Default, 
+    QueryId, 
+    SqlType
 )]
 struct Task {
     id: i32,
+    description: String,
+    done: i32
+}
+
+use schema::tasks;
+
+#[derive(Insertable, FromForm)]
+#[table_name="tasks"]
+struct iTask {
     description: String,
     done: i32
 }
@@ -46,16 +58,22 @@ fn index() -> &'static str {
     "Hello, world"
 }
 
-// #[post("/createTodo", data = "<task>")]
-// fn createTodo(task: Form<Task>) -> Json<Task> {
-//     // format!("description, '{}', done is {}",task.description, task.done)
-//     let newTask: Task = Task {
-//         // id: 1,
-//         // description: task.description.to_string(),
-//         // done: task.done,
-//     };
-//     Json(newTask)
-// }
+#[post("/createTodo", data = "<task>")]
+fn createTodo(task: Form<iTask>) -> String {
+
+    let connection = establish_connection();
+    let new_task = iTask {
+        description: task.description.to_string(),
+        done: task.done,
+    };
+
+    diesel::insert_into(tasks::table)
+        .values(&new_task)
+        .execute(&connection)
+        .expect("Error saving new post");
+
+        format!("ok")
+}
 
 
 #[get("/getTodos")]
@@ -82,6 +100,7 @@ fn getTodos() -> Json<Vec<Task>> {
     //  use schema::task::dsl::*;
     // use rustrocket::schema::tasks::dsl::*;`
     use schema::tasks::dsl::*;
+
     let connection = establish_connection();
     let results = tasks
     // .select(Task.description)
@@ -94,13 +113,45 @@ fn getTodos() -> Json<Vec<Task>> {
     
 }
 
+#[post("/deleteTodo/<task_id>")]
+fn deleteTodo(task_id: i32) -> String {
+
+    use schema::tasks::dsl::*;
+
+    let connection = establish_connection();
+    let num_deleted = diesel::delete(tasks.filter(id.eq(task_id)))
+        .execute(&connection)
+        .expect("Error deleting tasks");
+
+        format!("ok")
+}
+
+#[post("/updateTodo", data = "<task>")]
+fn updateTodo(task: Form<Task>) -> String {
+
+    use schema::tasks::dsl::*;
+    let connection = establish_connection();
+
+    let updated_row = diesel::update(tasks.filter(id.eq(task.id)))
+    .set((
+        // description.eq(task.description), 
+        done.eq(task.done)
+    ))
+    .execute(&connection);
+
+    format!("ok")
+}
+
+
 fn main() {
     rocket::ignite()
     .mount("/", 
     routes![
         index,
-        // createTodo,
-        getTodos
+        createTodo,
+        getTodos,
+        deleteTodo,
+        updateTodo
     ])
     .launch();
 }

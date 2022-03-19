@@ -1,5 +1,13 @@
 "# rustrocket" 
 
+
+routes
+
+=> POST /createTodo (createTodo)
+=> GET /getTodos (getTodos)
+=> POST /deleteTodo/<task_id> (deleteTodo)
+=> POST /updateTodo (updateTodo)
+
 diesel
 https://docs.rs/diesel/1.1.1/diesel/mysql/index.html
 https://docs.diesel.rs/diesel/fn.insert_into.html
@@ -29,3 +37,5 @@ vue.js key modifiers
 https://v2.vuejs.org/v2/guide/events.html?redirect=true#Key-Modifiers
 https://vuejs.org/guide/essentials/event-handling.html
 https://stackoverflow.com/questions/42951967/handling-enter-key-in-vue-js
+
+

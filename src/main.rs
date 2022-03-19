@@ -16,8 +16,10 @@ use diesel::mysql::MysqlConnection;
 
 use dotenv::dotenv;
 use std::env;
+use schema::tasks;
 
 mod schema;
+
 
 #[derive(FromForm, 
     Serialize, 
@@ -34,11 +36,19 @@ struct Task {
     done: i32
 }
 
-use schema::tasks;
-
 #[derive(Insertable, FromForm)]
 #[table_name="tasks"]
 struct iTask {
+    description: String,
+    done: i32
+}
+
+
+
+#[derive(Insertable, FromForm, Clone)]
+#[table_name="tasks"]
+struct dTask {
+    id: i32,
     description: String,
     done: i32
 }
@@ -126,15 +136,16 @@ fn deleteTodo(task_id: i32) -> String {
         format!("ok")
 }
 
-#[post("/updateTodo", data = "<task>")]
-fn updateTodo(task: Form<Task>) -> String {
+#[post("/updateTodo"/*,format = 
+"application/x-www-form-urlencoded"*/, data = "<task>")]
+fn updateTodo(task: Form<dTask>) -> String {
 
     use schema::tasks::dsl::*;
     let connection = establish_connection();
 
-    let updated_row = diesel::update(tasks.filter(id.eq(task.id)))
+    diesel::update(tasks.filter(id.eq(task.id)))
     .set((
-        // description.eq(task.description), 
+        description.eq(task.description.clone()), 
         done.eq(task.done)
     ))
     .execute(&connection);

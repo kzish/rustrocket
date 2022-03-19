@@ -2,11 +2,12 @@
 
 
 routes
-
+````
 => POST /createTodo (createTodo)
 => GET /getTodos (getTodos)
 => POST /deleteTodo/<task_id> (deleteTodo)
 => POST /updateTodo (updateTodo)
+```
 
 diesel
 https://docs.rs/diesel/1.1.1/diesel/mysql/index.html

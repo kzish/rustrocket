@@ -33,7 +33,7 @@
                  <div class="form-group">
                   <label><h2>Add Description</h2></label>
                   <div class="input-group mb-3">
-                    <input ref="task_description" type="text" class="form-control" placeholder="type description...">
+                    <input v-on:keyup.enter="createTask"  ref="task_description" type="text" class="form-control" placeholder="type description...">
                     <div class="input-group-append">
                       <button @click="createTask" class="btn btn-info">Add Task</button>
                     </div>
@@ -56,9 +56,25 @@
                     </thead>
                     <tbody>
                       <tr v-for="(task, index) in tasks" :key="task.id">
-                        <th scope="row">{{index+1}}</th>
-                        <td :title="task.description">{{task.description}}</td>
-                        <td><input type="checkbox" :checked="task.done==1"></td>
+                        
+                        <th scope="row">
+                          {{index+1}}
+                        </th>
+
+                        <!-- strike through text for completed task -->
+                        <td :title="task.description" v-if="task.done==1">
+                          <s> 
+                           {{task.description}} 
+                          </s>
+                        </td>
+                        <!-- no strike through text for completed task -->
+                        <td :title="task.description" v-if="task.done==0">
+                           {{task.description}} 
+                        </td>
+
+                        <td>
+                          <input style="transform: scale(1.5);" @change="updateTask(task, $event.target)" type="checkbox" :checked="task.done==1">
+                        </td>
                         <td>
                           <img @click="deleteTask(task)" src="assets/img/trash-can.svg" height="25" style="cursor:pointer;" title="remove" />
                         </td>
@@ -154,9 +170,36 @@ export default {
             this.getTasks()
           });
     },
-    // updateTask(task) {
+    updateTask(task, checkbox) {
+    //   if(this.$refs.task_description.value == "") {
+    //   alert('Add a descrtiption');
+    //   return;
+    // }
 
-    // },
+      console.log(checkbox.checked);
+      const new_task = querystring.stringify({
+            id: task.id,
+            // description: task.description,
+            done: checkbox.checked ? 1 : 0
+      });
+
+      this.isLoading = true;
+
+      axios.post(globals.api_end_point + "/updateTodo", new_task )
+          .then(response => 
+          {
+            console.log('debug', response);
+            this.$refs.task_description.value = "";
+          }).catch(error => 
+          { 
+            console.log('error', error);
+            alert('Error occurred, creating a task');
+          })
+          .finally(()=> {
+            this.isLoading = false;
+            this.getTasks()
+          });
+    },
     deleteTask(task) {
         this.isLoading = true;
         axios.post(globals.api_end_point + "/deleteTodo/" + task.id)

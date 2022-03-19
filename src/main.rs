@@ -74,7 +74,7 @@ struct iTask {
 #[table_name="tasks"]
 struct dTask {
     id: i32,
-    description: String,
+    // description: String,
     done: i32
 }
 
@@ -161,8 +161,7 @@ fn deleteTodo(task_id: i32) -> String {
         format!("ok")
 }
 
-#[post("/updateTodo"/*,format = 
-"application/x-www-form-urlencoded"*/, data = "<task>")]
+#[post("/updateTodo", data = "<task>")]
 fn updateTodo(task: Form<dTask>) -> String {
 
     use schema::tasks::dsl::*;
@@ -170,14 +169,13 @@ fn updateTodo(task: Form<dTask>) -> String {
 
     diesel::update(tasks.filter(id.eq(task.id)))
     .set((
-        description.eq(task.description.clone()), 
+        // description.eq(task.description.clone()), 
         done.eq(task.done)
     ))
     .execute(&connection);
 
     format!("ok")
 }
-
 
 fn main() {
     rocket::ignite()

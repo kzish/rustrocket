@@ -2,7 +2,7 @@
 
 
 routes
-````
+```
 => POST /createTodo (createTodo)
 => GET /getTodos (getTodos)
 => POST /deleteTodo/<task_id> (deleteTodo)

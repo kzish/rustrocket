@@ -13,3 +13,10 @@ crates.io
 https://crates.io/crates/rocket_contrib
 
 
+add cors
+https://stackoverflow.com/questions/62412361/how-to-set-up-cors-or-options-for-rocket-rs
+
+
+axios query string
+https://stackoverflow.com/questions/31756756/axios-http-client-how-to-construct-http-post-url-with-form-params
+
